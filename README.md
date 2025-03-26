@@ -5,7 +5,7 @@ Go-клиент для работы с API GigaChat.
 ## Установка
 
 ```bash
-go get github.com/yourusername/gigachat
+go get github.com/evgensoft/gigachat
 ```
 
 ## Использование
