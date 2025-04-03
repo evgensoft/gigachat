@@ -68,9 +68,12 @@ const (
 
 // Model константы для доступных моделей
 const (
-	ModelGigaChat    = "GigaChat"
-	ModelGigaChatPro = "GigaChat-Pro"
-	ModelGigaChatMax = "GigaChat-Max"
+	ModelGigaChat     = "GigaChat"
+	ModelGigaChatPro  = "GigaChat-Pro"
+	ModelGigaChatMax  = "GigaChat-Max"
+	ModelGigaChat2    = "GigaChat-2"
+	ModelGigaChatPro2 = "GigaChat-2-Pro"
+	ModelGigaChatMax2 = "GigaChat-2-Max"
 )
 
 // Role константы для ролей сообщений
