@@ -114,20 +114,15 @@ func (c *Client) ensureValidToken() error {
 	return nil
 }
 
-// Chat отправляет запрос к чату
-func (c *Client) Chat(req *ChatRequest) (*ChatResponse, error) {
+// SendBytes отправляет байты в чат
+func (c *Client) SendBytes(query []byte) ([]byte, error) {
 	// Проверяем валидность токена
 	if err := c.ensureValidToken(); err != nil {
 		return nil, err
 	}
 
-	jsonData, err := json.Marshal(req)
-	if err != nil {
-		return nil, fmt.Errorf("ошибка маршалинга запроса: %w", err)
-	}
-
 	// Создаем запрос
-	httpReq, err := http.NewRequest("POST", fmt.Sprintf("%s/chat/completions", baseURL), bytes.NewBuffer(jsonData))
+	httpReq, err := http.NewRequest("POST", fmt.Sprintf("%s/chat/completions", baseURL), bytes.NewBuffer(query))
 	if err != nil {
 		return nil, fmt.Errorf("ошибка создания запроса: %w", err)
 	}
@@ -146,14 +141,28 @@ func (c *Client) Chat(req *ChatRequest) (*ChatResponse, error) {
 	}
 	defer resp.Body.Close()
 
-	// Читаем тело ответа
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, fmt.Errorf("ошибка чтения ответа: %w", err)
+	if resp.StatusCode != http.StatusOK {
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return nil, fmt.Errorf("ошибка чтения ответа: %w", err)
+		} else {
+			return body, fmt.Errorf("Некорректный статус ответа: %v", resp.Status)
+		}
 	}
 
-	// Проверяем статус ответа
-	if resp.StatusCode != http.StatusOK {
+	// Возвращаем тело ответа
+	return io.ReadAll(resp.Body)
+}
+
+// Chat отправляет запрос к чату
+func (c *Client) Chat(req *ChatRequest) (*ChatResponse, error) {
+	jsonData, err := json.Marshal(req)
+	if err != nil {
+		return nil, fmt.Errorf("ошибка маршалинга запроса: %w", err)
+	}
+
+	body, err := c.SendBytes(jsonData)
+	if err != nil {
 		var errResp ErrorResponse
 		if err := json.Unmarshal(body, &errResp); err != nil {
 			return nil, fmt.Errorf("ошибка разбора ответа об ошибке: %w", err)
