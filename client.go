@@ -2,6 +2,7 @@ package gigachat
 
 import (
 	"bytes"
+	"crypto/tls"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -40,6 +41,9 @@ func NewClient(clientID, clientSecret string) *Client {
 		scope:        ScopePersonal, // По умолчанию используем персональный scope
 		httpClient: &http.Client{
 			Timeout: 30 * time.Second,
+			Transport: &http.Transport{
+				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+			},
 		},
 	}
 }
